@@ -7,26 +7,42 @@
     </header>
     <!-- <RankingLayout />
     <GameLayout/> -->
-    <RouterView/>
+    <RouterView />
     <footer class="app-vue" style="background-color:honeydew">
-      <RouterLink to="/" class="btn btn-dark" style="display: inline-flex; align-items: center; gap: 8px; width: fit-content;">
-        <img alt="メイン" src="./assets/favorite.png" width="30%" height="30%" />
-        メイン
+
+      <RouterLink to="/" class="btn btn-dark"
+        style="display: inline-flex; align-items: center; gap: 8px; width: fit-content;"
+        :class="{ 'disabled': screenMode === 0 }">
+
+        <img alt="ゲーム" src="./assets/favorite.png" width="30%" height="30%" />
+        ゲーム
       </RouterLink>
-      <RouterLink to="/ranking" class="btn btn-dark" style="display: inline-flex; align-items: center; gap: 8px; width: fit-content;">
+
+      <RouterLink to="/ranking" class="btn btn-dark"
+        style="display: inline-flex; align-items: center; gap: 8px; width: fit-content;"
+        :class="{ 'disabled': screenMode === 1 }">
         <img alt="ランキング" src="./assets/ranking.png" width="30%" height="30%" />
         ランキング
       </RouterLink>
+
     </footer>
   </div>
 </template>
 
 <script setup>
-import { RouterView, RouterLink } from 'vue-router'
-import GameLayout from './components/GameLayout.vue'
-import RankingLayout from './components/RankingLayout.vue';
+import { ref,watch } from 'vue'
+import { RouterView, RouterLink,useRoute } from 'vue-router'
 
+const screenMode = ref(0)
+const route = useRoute()
 
+watch(()=>route.path,(newPath)=>{
+  if(newPath === '/'){
+    screenMode.value = 0
+  }else if (newPath === '/ranking'){
+    screenMode.value = 1
+  }
+})
 </script>
 
 <style>
