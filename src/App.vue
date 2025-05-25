@@ -1,9 +1,9 @@
 <template>
   <div class="app-wrapper">
     <header class="app-vue" style="background-color: cornflowerblue;">
-      <img alt="タイトル1" src="./assets/escape1.png" width="20%" height="20%" />
+      <img alt="タイトル1" src="./assets/escape1_left.png" width="20%" height="20%" />
       <div style="font-family: Meiryo, sans-serif; font-size: 1.5rem;font-weight:bold; color: white;">EMOJI-ESCAPE</div>
-      <img alt="タイトル2" src="./assets/escape2.png" width="20%" height="20%" />
+      <img alt="タイトル2" src="./assets/escape2_left.png" width="20%" height="20%" />
     </header>
     <!-- <RankingLayout />
     <GameLayout/> -->
