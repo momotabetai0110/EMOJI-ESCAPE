@@ -1,6 +1,12 @@
 <template>
+
     <div class="game-screen" ref="gameScreenRef">
+
         <!-- ここがゲーム画面 -->
+        <div v-if="gameStatus != 0" class="count-time">
+            {{ Math.floor(countTime / 100).toString().padStart(2, '0') }}.{{ (countTime % 60).toString().padStart(2,
+            '0') }} </div>
+
         <div ref="userRef" class="character" :style="{ left: `${position.x}px`, top: `${position.y}px` }">
             <img v-show="userImage" alt="user" src="../assets/escape1_right.png" />
             <img v-show="!userImage" alt="user" src="../assets/escape1_left.png" />
@@ -9,12 +15,22 @@
             <img v-show="userImage" alt="target" src="../assets/escape2_right.png" />
             <img v-show="!userImage" alt="target" src="../assets/escape2_left.png" />
         </div>
+
+        <!-- スタート画面 -->
+        <div v-if="gameStatus == 0">
+            <div class="start-screen" @click="startGame">
+                <div class="start-text">START!!</div>
+            </div>
+        </div>
     </div>
+
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 
+const gameStatus = ref(0) // 0: スタート画面, 1: ゲーム中, 2: ゲームクリア, 3: ゲームオーバー
+const countTime = ref(1500) //ミリ秒
 const userRef = ref(null)
 const targetRef = ref(null)
 const gameScreenRef = ref(null)
@@ -29,6 +45,22 @@ const characterSize = ref({ width: 60, height: 60 }) // 固定サイズ
 
 const maxX = computed(() => Math.floor(gameScreenSize.value.width - characterSize.value.width))
 const maxY = computed(() => Math.floor(gameScreenSize.value.height - characterSize.value.height))
+
+const startGame = () => {
+    gameStatus.value = 1
+    startTimer()
+
+}
+
+const startTimer = () => {
+    const timer = setInterval(() => {
+        countTime.value--
+        if (countTime.value <= 0) {
+            gameStatus.value = 3
+            clearInterval(timer)
+        }
+    }, 10)
+}
 
 const updateGameScreenSize = () => {
     if (gameScreenRef.value) {
@@ -138,7 +170,8 @@ onMounted(() => {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
-    transform: translateZ(0); /* GPUアクセラレーションを有効化 */
+    transform: translateZ(0);
+    /* GPUアクセラレーションを有効化 */
 }
 
 .character img {
@@ -146,5 +179,47 @@ onMounted(() => {
     height: 100%;
     object-fit: contain;
     display: block;
+}
+
+.start-screen {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.start-text {
+    font-size: 100px;
+    color: #ffffff;
+    z-index: 3;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    49% {
+        opacity: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 0;
+    }
+}
+
+.count-time {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    color: #1395ff;
+    font-size: 30px;
 }
 </style>
