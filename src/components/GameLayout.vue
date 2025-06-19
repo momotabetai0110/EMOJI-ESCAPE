@@ -3,7 +3,11 @@
         <!-- ここがゲーム画面 -->
         <div ref="userRef" class="character" :style="{ left: `${position.x}px`, top: `${position.y}px` }">
             <img v-show="userImage" alt="user" src="../assets/escape1_right.png" />
-            <img v-show="!userImage" alt="target" src="../assets/escape1_left.png" />
+            <img v-show="!userImage" alt="user" src="../assets/escape1_left.png" />
+        </div>
+        <div ref="targetRef" class="character" :style="{ left: `${targetPosition.x}px`, top: `${targetPosition.y}px` }">
+            <img v-show="userImage" alt="target" src="../assets/escape2_right.png" />
+            <img v-show="!userImage" alt="target" src="../assets/escape2_left.png" />
         </div>
     </div>
 </template>
@@ -12,10 +16,12 @@
 import { ref, onMounted, computed } from 'vue'
 
 const userRef = ref(null)
+const targetRef = ref(null)
 const gameScreenRef = ref(null)
 const userImage = ref(true)
 const isTouch = ref(false)
 const position = ref({ x: 0, y: 0 })
+const targetPosition = ref({ x: 200, y: 200 })
 const startPosition = ref({ x: 0, y: 0 })
 const lastPosition = ref({ x: 0, y: 0 })
 const gameScreenSize = ref({ width: 0, height: 0 })
@@ -44,6 +50,24 @@ const constrainPosition = (x, y) => {
     }
 }
 
+const moveTarget = (distanceX, distanceY, distance) => {
+    if (distance < 100) {
+        // プレイヤーの位置に基づいて移動方向を決定
+        const dx = position.value.x - targetPosition.value.x
+        const dy = position.value.y - targetPosition.value.y
+
+        // 方向ベクトルを正規化
+        const moveX = (dx / distance) * -5
+        const moveY = (dy / distance) * -5
+
+        const newPosition = {
+            x: targetPosition.value.x + moveX,
+            y: targetPosition.value.y + moveY
+        }
+        targetPosition.value = constrainPosition(newPosition.x, newPosition.y)
+    }
+}
+
 onMounted(() => {
     updateGameScreenSize()
 
@@ -56,12 +80,12 @@ onMounted(() => {
             x: Math.floor(touch.clientX - rect.left - position.value.x),
             y: Math.floor(touch.clientY - rect.top - position.value.y)
         }
-    },{passive:false})
+    }, { passive: false })
 
     userRef.value.addEventListener('touchend', (e) => {
         e.preventDefault()
         isTouch.value = false
-    },{passive:false})
+    }, { passive: false })
 
     userRef.value.addEventListener('touchmove', (e) => {
         e.preventDefault()
@@ -81,8 +105,15 @@ onMounted(() => {
                 userImage.value = false
             }
             lastPosition.value = { ...position.value }
+
+            // 実際の距離を計算（絶対値は使用しない）
+            const dx = position.value.x - targetPosition.value.x
+            const dy = position.value.y - targetPosition.value.y
+            const distance = Math.sqrt(dx * dx + dy * dy)
+
+            moveTarget(dx, dy, distance)
         }
-    },{passive:false})
+    }, { passive: false })
 })
 </script>
 
