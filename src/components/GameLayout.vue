@@ -2,10 +2,10 @@
 
     <div class="game-screen" ref="gameScreenRef">
 
-        <!-- ここがゲーム画面 -->
+        <!-- ゲーム画面 -->
         <div v-if="gameStatus != 0" class="count-time">
             {{ Math.floor(countTime / 100).toString().padStart(2, '0') }}.{{ (countTime % 60).toString().padStart(2,
-            '0') }} </div>
+                '0') }} </div>
 
         <div ref="userRef" class="character" :style="{ left: `${position.x}px`, top: `${position.y}px` }">
             <img v-show="userImage" alt="user" src="../assets/escape1_right.png" />
@@ -22,15 +22,48 @@
                 <div class="start-text">START!!</div>
             </div>
         </div>
+
+        <!-- モーダル画面 -->
+        <div v-if="isModal">
+            <BaseModal v-model="isModal" :title=modalTitle>
+                <div v-if="gameStatus == 3" class="modal-content">
+                    <h1>逃げられてしまった...</h1>
+                    <div class="modal-inner">
+                        <img alt="game-over" src="../assets/game-over.png" style="height: 35%; width: 35%;">
+                        <div class="modal-button">
+                            <button type="button" class="btn btn-light" @click="resetGame()">再挑戦</button>
+                            <button type="button" class="btn btn-light">ランキングへ</button>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="gameStatus == 2" class="modal-content">
+                    <h1>クリア！！</h1>
+                    <div class="modal-inner">
+                        <img alt="game-over" src="../assets/game-clear.png" style="height: 50%; width: 50%;">
+                        <div class="modal-button">
+                            <button type="button" class="btn btn-light" @click="resetGame()">再挑戦</button>
+                            <button type="button" class="btn btn-light">ランキングへ</button>
+                        </div>
+                    </div>
+                </div>
+            </BaseModal>
+
+        </div>
     </div>
 
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import BaseModal from './BaseModal.vue'
 
+//ゲームステータス管理
 const gameStatus = ref(0) // 0: スタート画面, 1: ゲーム中, 2: ゲームクリア, 3: ゲームオーバー
-const countTime = ref(1500) //ミリ秒
+const countTime = ref(100) //1500ミリ秒
+const isModal = ref(false)
+const modalTitle = ref('')
+
+//ゲームキャラ管理
 const userRef = ref(null)
 const targetRef = ref(null)
 const gameScreenRef = ref(null)
@@ -56,12 +89,27 @@ const startTimer = () => {
     const timer = setInterval(() => {
         countTime.value--
         if (countTime.value <= 0) {
-            gameStatus.value = 3
+            gameStatus.value = 2
             clearInterval(timer)
+            gameOver()
         }
     }, 10)
 }
 
+const gameOver = () => {
+    isModal.value = true
+    modalTitle.value = 'ゲームオーバー'
+
+}
+
+const resetGame = () => {
+    gameStatus.value = 0
+    countTime.value = 1000
+    isModal.value = false
+    targetPosition.value = { x: 200, y: 200 }
+    position.value = { x: 0, y: 0 }
+    userImage.value = true
+}
 const updateGameScreenSize = () => {
     if (gameScreenRef.value) {
         const rect = gameScreenRef.value.getBoundingClientRect()
@@ -150,6 +198,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
+
 .game-screen {
     background: linear-gradient(90deg, #c2f3f3 0%, #c1e9fc 100%);
     flex: 1;
@@ -161,6 +211,31 @@ onMounted(() => {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
+}
+
+.modal-content {
+    align-items: center;
+}
+
+.modal-inner{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.modal-button{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+
+}
+
+.modal-button .btn {
+    font-size: 14px;
+    padding: 3px;
+    width: 100px;
 }
 
 .character {
