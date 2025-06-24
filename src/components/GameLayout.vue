@@ -2,30 +2,47 @@
 
     <div class="game-screen" ref="gameScreenRef">
 
-        <!-- ゲーム画面 -->
-        <div v-if="gameStatus != 0" class="count-time">
-            {{ Math.floor(countTime / 100).toString().padStart(2, '0') }}.{{ (countTime % 60).toString().padStart(2,
-                '0') }} </div>
-
-        <div ref="userRef" class="character" :style="{ left: `${position.x}px`, top: `${position.y}px` }">
-            <img v-show="userImage" alt="user" src="../assets/escape1_right.png" />
-            <img v-show="!userImage" alt="user" src="../assets/escape1_left.png" />
-        </div>
-        <div ref="targetRef" class="character" :style="{ left: `${targetPosition.x}px`, top: `${targetPosition.y}px` }">
-            <img v-show="userImage" alt="target" src="../assets/escape2_right.png" />
-            <img v-show="!userImage" alt="target" src="../assets/escape2_left.png" />
-        </div>
-
-        <!-- スタート画面 -->
+        <!-- スタート -->
         <div v-if="gameStatus == 0">
             <div class="start-screen" @click="startGame">
+                <button type="button" class="btn btn-light" @click.stop="openHelp()">遊び方</button>
                 <div class="start-text">START!!</div>
             </div>
         </div>
 
-        <!-- モーダル画面 -->
+        <!-- ゲーム画面 -->
+        <div v-if="gameStatus != 0" class="count-time">
+            {{ Math.floor(countTime / 100).toString().padStart(2, '0') }}.{{ (countTime % 60).toString().padStart(2,
+                '0')
+            }} </div>
+
+        <div ref="playerRef" class="character" :style="{ left: `${playerPosition.x}px`, top: `${playerPosition.y}px` }">
+            <img v-show="isRight" alt="player" src="../assets/escape1_right.png" />
+            <img v-show="!isRight" alt="player" src="../assets/escape1_left.png" />
+        </div>
+        <div ref="targetRef" class="character" :style="{ left: `${targetPosition.x}px`, top: `${targetPosition.y}px` }">
+            <img v-show="isRight" alt="target" src="../assets/escape2_right.png" />
+            <img v-show="!isRight" alt="target" src="../assets/escape2_left.png" />
+        </div>
+
+
+
+        <!-- モーダル -->
         <div v-if="isModal">
             <BaseModal v-model="isModal" :title=modalTitle>
+                <!-- ゲームクリア -->
+                <div v-if="gameStatus == 2" class="modal-content">
+                    <h1>ゲームクリア！！</h1>
+                    <div class="modal-inner">
+                        <img alt="game-clear" src="../assets/game-clear.png" style="height: 50%; width: 50%;">
+                        <div class="modal-button">
+                            <div>スコア：{{ score }}</div>
+                            <button type="button" class="btn btn-light" @click="resetGame()">再挑戦</button>
+                            <button type="button" class="btn btn-light">ランキングへ</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- ゲームオーバー -->
                 <div v-if="gameStatus == 3" class="modal-content">
                     <h1>逃げられてしまった...</h1>
                     <div class="modal-inner">
@@ -36,18 +53,17 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="gameStatus == 2" class="modal-content">
-                    <h1>クリア！！</h1>
+                <!-- 遊び方 -->
+                <div v-if="gameStatus == 0" class="modal-content">
+                    <h3>タップでプレイヤーを動かすことができます</h3>
                     <div class="modal-inner">
-                        <img alt="game-over" src="../assets/game-clear.png" style="height: 50%; width: 50%;">
                         <div class="modal-button">
-                            <button type="button" class="btn btn-light" @click="resetGame()">再挑戦</button>
-                            <button type="button" class="btn btn-light">ランキングへ</button>
+                            <p>15秒以内にプレイヤーがターゲットに触れればゲームクリア</p>
+                            <p>15秒経過するかターゲットが画面の端に到達するとゲームオーバー</p>
                         </div>
                     </div>
                 </div>
             </BaseModal>
-
         </div>
     </div>
 
@@ -58,58 +74,90 @@ import { ref, onMounted, computed } from 'vue'
 import BaseModal from './BaseModal.vue'
 
 //ゲームステータス管理
-const gameStatus = ref(0) // 0: スタート画面, 1: ゲーム中, 2: ゲームクリア, 3: ゲームオーバー
-const countTime = ref(100) //1500ミリ秒
-const isModal = ref(false)
-const modalTitle = ref('')
+const gameStatus = ref(0) // 0: スタート画面, 1: ゲーム中, 2: ゲームクリア, 3: ゲームオーバー, 4: 遊び方
+const countTime = ref(1500) //1500ミリ秒(15秒)
+const isModal = ref(false) //モーダル表示
+const modalTitle = ref('') //モーダルタイトル
+const timer = ref(null)
+
+//ゲーム画面管理
+const gameScreenRef = ref(null)
+const gameScreenSize = ref({ width: 0, height: 0 })
+const isTouch = ref(false) //true:タッチ中,false:タッチしていない
+const score =ref(0)
 
 //ゲームキャラ管理
-const userRef = ref(null)
+const playerRef = ref(null)
+const playerPosition = ref({ x: 0, y: 0 })
 const targetRef = ref(null)
-const gameScreenRef = ref(null)
-const userImage = ref(true)
-const isTouch = ref(false)
-const position = ref({ x: 0, y: 0 })
 const targetPosition = ref({ x: 200, y: 200 })
+const isRight = ref(true) //true:右向き,false:左向き
 const startPosition = ref({ x: 0, y: 0 })
-const lastPosition = ref({ x: 0, y: 0 })
-const gameScreenSize = ref({ width: 0, height: 0 })
-const characterSize = ref({ width: 60, height: 60 }) // 固定サイズ
+const lastPosition = ref({ x: 0, y: 0 }) //前回のプレイヤーの位置
+const maxX = computed(() => Math.floor(gameScreenSize.value.width - 60)) //キャラクターの最大x座標
+const maxY = computed(() => Math.floor(gameScreenSize.value.height - 60)) //キャラクターの最大y座標
 
-const maxX = computed(() => Math.floor(gameScreenSize.value.width - characterSize.value.width))
-const maxY = computed(() => Math.floor(gameScreenSize.value.height - characterSize.value.height))
+//遊び方
+const openHelp = () => {
+    gameStatus.value = 0
+    modalTitle.value = 'ルール'
+    isModal.value = true
+}
 
+//遊び方を閉じる
+const closeHelp = () => {
+    gameStatus.value = 0
+    isModal.value = false
+}
+
+
+//ゲームスタート
 const startGame = () => {
     gameStatus.value = 1
     startTimer()
-
 }
 
+//タイマースタート
 const startTimer = () => {
-    const timer = setInterval(() => {
+    timer.value = setInterval(() => {
         countTime.value--
         if (countTime.value <= 0) {
-            gameStatus.value = 2
-            clearInterval(timer)
+            gameStatus.value = 3
+            clearInterval(timer.value)
             gameOver()
         }
     }, 10)
 }
 
+//ゲームオーバー
 const gameOver = () => {
-    isModal.value = true
+    isTouch.value = false
+    clearInterval(timer.value)
     modalTitle.value = 'ゲームオーバー'
+    isModal.value = true
 
 }
 
+//ゲームクリア
+const gameClear = () => {
+    clearInterval(timer.value)
+    console.log(countTime.value)
+    score.value = 1500 - (1500 - countTime.value)
+    modalTitle.value = 'ゲームクリア'
+    isModal.value = true
+}
+
+//ゲームリセット
 const resetGame = () => {
     gameStatus.value = 0
     countTime.value = 1000
     isModal.value = false
     targetPosition.value = { x: 200, y: 200 }
-    position.value = { x: 0, y: 0 }
-    userImage.value = true
+    playerPosition.value = { x: 0, y: 0 }
+    isRight.value = true
 }
+
+//ゲーム画面サイズの取得
 const updateGameScreenSize = () => {
     if (gameScreenRef.value) {
         const rect = gameScreenRef.value.getBoundingClientRect()
@@ -120,6 +168,7 @@ const updateGameScreenSize = () => {
     }
 }
 
+//キャラクターの位置を制限
 const constrainPosition = (x, y) => {
     const constrainedX = Math.max(0, Math.min(Math.floor(x), maxX.value))
     const constrainedY = Math.max(0, Math.min(Math.floor(y), maxY.value))
@@ -130,44 +179,48 @@ const constrainPosition = (x, y) => {
     }
 }
 
-const moveTarget = (distanceX, distanceY, distance) => {
-    if (distance < 100) {
-        // プレイヤーの位置に基づいて移動方向を決定
-        const dx = position.value.x - targetPosition.value.x
-        const dy = position.value.y - targetPosition.value.y
+//ターゲットが逃げる処理
+const escapeTarget = (distanceX, distanceY, distance) => {
+    const escapeX = (distanceX / distance) * -5
+    const escapeY = (distanceY / distance) * -5
 
-        // 方向ベクトルを正規化
-        const moveX = (dx / distance) * -5
-        const moveY = (dy / distance) * -5
+    const newPosition = {
+        x: targetPosition.value.x + escapeX,
+        y: targetPosition.value.y + escapeY
+    }
+    targetPosition.value = constrainPosition(newPosition.x, newPosition.y)
 
-        const newPosition = {
-            x: targetPosition.value.x + moveX,
-            y: targetPosition.value.y + moveY
-        }
-        targetPosition.value = constrainPosition(newPosition.x, newPosition.y)
+    //ターゲットが画面の端に到達したらゲームオーバー
+    if (targetPosition.value.x == 0 || targetPosition.value.x == maxX.value || targetPosition.value.y == 0 || targetPosition.value.y == maxY.value) {
+        gameStatus.value = 3
+        gameOver()
     }
 }
 
 onMounted(() => {
+    //ゲーム画面サイズの取得
     updateGameScreenSize()
 
-    userRef.value.addEventListener('touchstart', (e) => {
+    //プレイヤーをタッチした時の処理
+    playerRef.value.addEventListener('touchstart', (e) => {
         e.preventDefault()
         isTouch.value = true
         const touch = e.touches[0]
         const rect = gameScreenRef.value.getBoundingClientRect()
         startPosition.value = {
-            x: Math.floor(touch.clientX - rect.left - position.value.x),
-            y: Math.floor(touch.clientY - rect.top - position.value.y)
+            x: Math.floor(touch.clientX - rect.left - playerPosition.value.x),
+            y: Math.floor(touch.clientY - rect.top - playerPosition.value.y)
         }
     }, { passive: false })
 
-    userRef.value.addEventListener('touchend', (e) => {
+    //プレイヤーから指を離した時の処理
+    playerRef.value.addEventListener('touchend', (e) => {
         e.preventDefault()
         isTouch.value = false
     }, { passive: false })
 
-    userRef.value.addEventListener('touchmove', (e) => {
+    //プレイヤーをタッチしながら移動した時の処理
+    playerRef.value.addEventListener('touchmove', (e) => {
         e.preventDefault()
         if (isTouch.value) {
             const touch = e.touches[0]
@@ -177,29 +230,33 @@ onMounted(() => {
                 y: Math.floor(touch.clientY - rect.top - startPosition.value.y)
             }
 
-            position.value = constrainPosition(newPosition.x, newPosition.y)
+            playerPosition.value = constrainPosition(newPosition.x, newPosition.y)
 
-            if (position.value.x > lastPosition.value.x) {
-                userImage.value = true
-            } else if (position.value.x < lastPosition.value.x) {
-                userImage.value = false
+            if (playerPosition.value.x > lastPosition.value.x) {
+                isRight.value = true
+            } else if (playerPosition.value.x < lastPosition.value.x) {
+                isRight.value = false
             }
-            lastPosition.value = { ...position.value }
+            lastPosition.value = { ...playerPosition.value }
 
-            // 実際の距離を計算（絶対値は使用しない）
-            const dx = position.value.x - targetPosition.value.x
-            const dy = position.value.y - targetPosition.value.y
+            //ターゲットとプレイヤーの距離を計算
+            const dx = playerPosition.value.x - targetPosition.value.x
+            const dy = playerPosition.value.y - targetPosition.value.y
             const distance = Math.sqrt(dx * dx + dy * dy)
-
-            moveTarget(dx, dy, distance)
+            if (distance < 60) {
+                //距離が60未満の場合はゲームクリア
+                gameStatus.value = 2
+                gameClear()
+            } else if (distance < 100) {
+                //距離が100未満の場合はターゲットが逃げる
+                escapeTarget(dx, dy, distance)
+            }
         }
     }, { passive: false })
 })
 </script>
 
 <style scoped>
-
-
 .game-screen {
     background: linear-gradient(90deg, #c2f3f3 0%, #c1e9fc 100%);
     flex: 1;
@@ -217,14 +274,14 @@ onMounted(() => {
     align-items: center;
 }
 
-.modal-inner{
+.modal-inner {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 20px;
 }
 
-.modal-button{
+.modal-button {
     display: flex;
     flex-direction: column;
     gap: 10px;
