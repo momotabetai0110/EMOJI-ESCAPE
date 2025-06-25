@@ -5,7 +5,7 @@
         <!-- スタート -->
         <div v-if="gameStatus == 0">
             <div class="start-screen" @click="startGame">
-                <button type="button" class="btn btn-light" @click.stop="openHelp()">遊び方</button>
+                <img alt="help" src="../assets/help.png" style="height: 10%; width: 15%;" @click.stop="openHelp()">
                 <div class="start-text">START!!</div>
             </div>
         </div>
@@ -54,12 +54,17 @@
                     </div>
                 </div>
                 <!-- 遊び方 -->
-                <div v-if="gameStatus == 0" class="modal-content">
-                    <h3>タップでプレイヤーを動かすことができます</h3>
+                <div v-if="gameStatus == 0" class="modal-content" style="padding-top: 25px;">
+                    <h4>指で<img alt="player" src="../assets/escape1_right.png"
+                            style="height: 5%; width: 10%; padding-top: 10px;">を動かすことができます</h4>
                     <div class="modal-inner">
-                        <div class="modal-button">
-                            <p>時間内にターゲットを捕まえればゲームクリア</p>
-                            <p>15秒経過するかターゲットが画面の端に到達するとゲームオーバー</p>
+                        <div class="modal-rule">
+                            <h6>【ゲームクリア】</h6>
+                            <p>時間内に<img alt="target" src="../assets/escape2_right.png"
+                                    style="height: 5%; width: 10%;">をつかまえる。</p>
+                            <h6>【ゲームオーバー】</h6>
+                            <p><img alt="target" src="../assets/escape2_right.png"
+                                    style="height: 5%; width: 10%;">が画面端に到達するか15秒経過する。</p>
                         </div>
                     </div>
                 </div>
@@ -84,7 +89,7 @@ const timer = ref(null)
 const gameScreenRef = ref(null)
 const gameScreenSize = ref({ width: 0, height: 0 })
 const isTouch = ref(false) //true:タッチ中,false:タッチしていない
-const score =ref(0)
+const score = ref(0)
 
 //ゲームキャラ管理
 const playerRef = ref(null)
@@ -241,22 +246,22 @@ onMounted(() => {
 
             //ターゲットとプレイヤーの距離を計算
             for (let i = 0; i < 10; i++) {
-            const dx = playerPosition.value.x - targetPosition.value.x
-            const dy = playerPosition.value.y - targetPosition.value.y
-            const distance = Math.sqrt(dx * dx + dy * dy)
+                const dx = playerPosition.value.x - targetPosition.value.x
+                const dy = playerPosition.value.y - targetPosition.value.y
+                const distance = Math.sqrt(dx * dx + dy * dy)
 
-            //距離が100以上の場合は処理中止
-            if (distance >= 100) break;
+                //距離が100以上の場合は処理中止
+                if (distance >= 100) break;
 
-            if (distance < 60) {
-                //距離が60未満の場合はゲームクリア
-                gameStatus.value = 2
-                gameClear()
-            } else if (distance < 100) {
-                //距離が100未満の場合はターゲットが逃げる
-                escapeTarget(dx, dy, distance)
+                if (distance < 60) {
+                    //距離が60未満の場合はゲームクリア
+                    gameStatus.value = 2
+                    gameClear()
+                } else if (distance < 100) {
+                    //距離が100未満の場合はターゲットが逃げる
+                    escapeTarget(dx, dy, distance)
+                }
             }
-        }
         }
     }, { passive: false })
 })
@@ -292,6 +297,14 @@ onMounted(() => {
     flex-direction: column;
     gap: 10px;
     align-items: center;
+}
+
+.modal-rule {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+    margin-bottom: 0%;
 
 }
 
@@ -327,6 +340,7 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     background-color: #000;
