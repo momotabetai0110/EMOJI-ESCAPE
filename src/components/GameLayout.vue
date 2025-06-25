@@ -58,7 +58,7 @@
                     <h3>タップでプレイヤーを動かすことができます</h3>
                     <div class="modal-inner">
                         <div class="modal-button">
-                            <p>15秒以内にプレイヤーがターゲットに触れればゲームクリア</p>
+                            <p>時間内にターゲットを捕まえればゲームクリア</p>
                             <p>15秒経過するかターゲットが画面の端に到達するとゲームオーバー</p>
                         </div>
                     </div>
@@ -181,8 +181,8 @@ const constrainPosition = (x, y) => {
 
 //ターゲットが逃げる処理
 const escapeTarget = (distanceX, distanceY, distance) => {
-    const escapeX = (distanceX / distance) * -5
-    const escapeY = (distanceY / distance) * -5
+    const escapeX = (distanceX / distance) * -20
+    const escapeY = (distanceY / distance) * -20
 
     const newPosition = {
         x: targetPosition.value.x + escapeX,
@@ -240,9 +240,14 @@ onMounted(() => {
             lastPosition.value = { ...playerPosition.value }
 
             //ターゲットとプレイヤーの距離を計算
+            for (let i = 0; i < 10; i++) {
             const dx = playerPosition.value.x - targetPosition.value.x
             const dy = playerPosition.value.y - targetPosition.value.y
             const distance = Math.sqrt(dx * dx + dy * dy)
+
+            //距離が100以上の場合は処理中止
+            if (distance >= 100) break;
+
             if (distance < 60) {
                 //距離が60未満の場合はゲームクリア
                 gameStatus.value = 2
@@ -251,6 +256,7 @@ onMounted(() => {
                 //距離が100未満の場合はターゲットが逃げる
                 escapeTarget(dx, dy, distance)
             }
+        }
         }
     }, { passive: false })
 })
