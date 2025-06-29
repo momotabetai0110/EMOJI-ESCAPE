@@ -9,7 +9,7 @@
                 <slot>
                 </slot>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" v-if="showOKbutton">
                 <button class="btn btn-light" @click="closeModal()">OK</button>
             </div>
         </div>
@@ -27,6 +27,10 @@ const props = defineProps({
     modelValue: {
         type: Boolean,
         default: false
+    },
+    showOKbutton: {
+        type: Boolean,
+        default: true
     }
 })
 const emit = defineEmits(['update:modelValue'])
@@ -75,6 +79,7 @@ const closeModal = () => {
     justify-content: center;
     background-color: rgb(127, 178, 255);
     height: 15%;
+    border-radius: 8px;
 }
 
 .modal-body {
@@ -82,6 +87,7 @@ const closeModal = () => {
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 5px;
 }
 
 .modal-footer {

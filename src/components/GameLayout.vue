@@ -15,7 +15,7 @@
             {{ Math.floor(countTime / 100).toString().padStart(2, '0') }}.{{ (countTime % 60).toString().padStart(2,
                 '0')
             }} </div>
-        <div v-show="gameStatus != 0">
+        <div v-show="gameStatus == 1">
             <div ref="playerRef" class="character"
                 :style="{ left: `${playerPosition.x}px`, top: `${playerPosition.y}px` }">
                 <img v-show="isPlayerRight" alt="player" src="../assets/escape1_right.png" />
@@ -32,9 +32,9 @@
 
         <!-- モーダル -->
         <div v-if="isModal">
-            <BaseModal v-model="isModal" :title=modalTitle>
+            <BaseModal v-model="isModal" :showOKbutton=showOKbutton :title=modalTitle>
                 <!-- ゲームクリア -->
-                <div v-if="gameStatus == 2" class="modal-content">
+                <div v-if="gameStatus == 2" class="modal-content" :showOKbutton="false">
                     <h1>ゲームクリア！！</h1>
                     <div class="modal-inner">
                         <img alt="game-clear" src="../assets/game-clear.png" style="height: 50%; width: 50%;">
@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <!-- ゲームオーバー -->
-                <div v-if="gameStatus == 3" class="modal-content">
+                <div v-if="gameStatus == 3" class="modal-content" :showOKbutton="false">
                     <h1>逃げられてしまった...</h1>
                     <div class="modal-inner">
                         <img alt="game-over" src="../assets/game-over.png" style="height: 35%; width: 35%;">
@@ -57,9 +57,9 @@
                     </div>
                 </div>
                 <!-- 遊び方 -->
-                <div v-if="gameStatus == 0" class="modal-content" style="padding-top: 25px;">
+                <div v-if="gameStatus == 0" :showOKbutton="true" class="modal-content" style="padding-top: 25px;">
                     <h4>指で<img alt="player" src="../assets/escape1_right.png"
-                            style="height: 5%; width: 10%; padding-top: 10px;">を動かすことができます</h4>
+                            style="height: 5%; width: 10%; ">を動かすことができます</h4>
                     <div class="modal-inner">
                         <div class="modal-rule">
                             <h6>【ゲームクリア】</h6>
@@ -86,6 +86,7 @@ const gameStatus = ref(0) // 0: スタート画面, 1: ゲーム中, 2: ゲー�
 const countTime = ref(1500) //1500ミリ秒(15秒)
 const isModal = ref(false) //モーダル表示
 const modalTitle = ref('') //モーダルタイトル
+const showOKbutton = ref(false) //モーダルOKボタン表示
 const timer = ref(null)
 
 //ゲーム画面管理
@@ -109,16 +110,11 @@ const maxY = computed(() => Math.floor(gameScreenSize.value.height - 60)) //キ�
 //遊び方
 const openHelp = () => {
     gameStatus.value = 0
+    showOKbutton.value = true
     modalTitle.value = 'ルール'
     isModal.value = true
-}
 
-//遊び方を閉じる
-const closeHelp = () => {
-    gameStatus.value = 0
-    isModal.value = false
 }
-
 
 //ゲームスタート
 const startGame = () => {
@@ -141,6 +137,7 @@ const startTimer = () => {
 //ゲームオーバー
 const gameOver = () => {
     isTouch.value = false
+    showOKbutton.value = false
     clearInterval(timer.value)
     modalTitle.value = 'ゲームオーバー'
     isModal.value = true
@@ -150,6 +147,7 @@ const gameOver = () => {
 //ゲームクリア
 const gameClear = () => {
     isTouch.value = false
+    showOKbutton.value = false
     clearInterval(timer.value)
     score.value = 1500 - (1500 - countTime.value)
     modalTitle.value = 'ゲームクリア'
