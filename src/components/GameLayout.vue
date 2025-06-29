@@ -17,12 +17,12 @@
             }} </div>
 
         <div ref="playerRef" class="character" :style="{ left: `${playerPosition.x}px`, top: `${playerPosition.y}px` }">
-            <img v-show="isRight" alt="player" src="../assets/escape1_right.png" />
-            <img v-show="!isRight" alt="player" src="../assets/escape1_left.png" />
+            <img v-show="isPlayerRight" alt="player" src="../assets/escape1_right.png" />
+            <img v-show="!isPlayerRight" alt="player" src="../assets/escape1_left.png" />
         </div>
         <div ref="targetRef" class="character" :style="{ left: `${targetPosition.x}px`, top: `${targetPosition.y}px` }">
-            <img v-show="isRight" alt="target" src="../assets/escape2_right.png" />
-            <img v-show="!isRight" alt="target" src="../assets/escape2_left.png" />
+            <img v-show="isTargetRight" alt="target" src="../assets/escape2_right.png" />
+            <img v-show="!isTargetRight" alt="target" src="../assets/escape2_left.png" />
         </div>
 
 
@@ -95,8 +95,9 @@ const score = ref(0)
 const playerRef = ref(null)
 const playerPosition = ref({ x: 0, y: 0 })
 const targetRef = ref(null)
-const targetPosition = ref({ x: 200, y: 200 })
-const isRight = ref(true) //true:右向き,false:左向き
+const targetPosition = ref({ x: 0, y: 0 })
+const isPlayerRight = ref(true) //true:右向き,false:左向き
+const isTargetRight = ref(true) //true:右向き,false:左向き
 const startPosition = ref({ x: 0, y: 0 })
 const lastPosition = ref({ x: 0, y: 0 }) //前回のプレイヤーの位置
 const maxX = computed(() => Math.floor(gameScreenSize.value.width - 60)) //キャラクターの最大x座標
@@ -145,8 +146,8 @@ const gameOver = () => {
 
 //ゲームクリア
 const gameClear = () => {
+    isTouch.value = false
     clearInterval(timer.value)
-    console.log(countTime.value)
     score.value = 1500 - (1500 - countTime.value)
     modalTitle.value = 'ゲームクリア'
     isModal.value = true
@@ -159,7 +160,8 @@ const resetGame = () => {
     isModal.value = false
     targetPosition.value = { x: 200, y: 200 }
     playerPosition.value = { x: 0, y: 0 }
-    isRight.value = true
+    isPlayerRight.value = true
+    isTargetRight.value = true
 }
 
 //ゲーム画面サイズの取得
@@ -171,6 +173,38 @@ const updateGameScreenSize = () => {
             height: Math.floor(rect.height)
         }
     }
+}
+
+//キャラクターの位置を設定
+const setCharacterPosition = () => {
+    const targetDomain = {
+        //画面の25%から75%の範囲
+        minX: gameScreenSize.value.width / 4,
+        minY: gameScreenSize.value.height / 4,
+        maxX: gameScreenSize.value.width * 3 / 4,
+        maxY: gameScreenSize.value.height * 3 / 4
+    }
+
+    const playerDomains = [
+        { minX: 0, minY: 0, maxX: gameScreenSize.value.width / 4, maxY: gameScreenSize.value.height / 4 }, // 上部
+        { minX: gameScreenSize.value.width * 3 / 4, minY: 0, maxX: gameScreenSize.value.width, maxY: gameScreenSize.value.height }, // 右部
+        { minX: 0, minY: gameScreenSize.value.height * 3 / 4, maxX: gameScreenSize.value.width, maxY: gameScreenSize.value.height }, // 下部
+        { minX: 0, minY: 0, maxX: gameScreenSize.value.width / 4, maxY: gameScreenSize.value.height } // 左部
+    ]
+
+    const randomIndex = Math.floor(Math.random() * 4)
+    const playerDomain = playerDomains[randomIndex]
+
+    targetPosition.value = randomPosition(targetDomain)
+    playerPosition.value = randomPosition(playerDomain)
+}
+
+
+//与えられた範囲内でランダムな位置を返す
+const randomPosition = (domain) => {
+    const randomX = Math.floor(Math.random() * (domain.maxX - domain.minX + 1)) + domain.minX
+    const randomY = Math.floor(Math.random() * (domain.maxY - domain.minY + 1)) + domain.minY
+    return { x: randomX, y: randomY }
 }
 
 //キャラクターの位置を制限
@@ -189,6 +223,13 @@ const escapeTarget = (distanceX, distanceY, distance) => {
     const escapeX = (distanceX / distance) * -20
     const escapeY = (distanceY / distance) * -20
 
+    //ターゲットの向きを設定
+    if (escapeX > 0) {
+        isTargetRight.value = true
+    } else if (escapeX < 0) {
+        isTargetRight.value = false
+    }
+
     const newPosition = {
         x: targetPosition.value.x + escapeX,
         y: targetPosition.value.y + escapeY
@@ -205,6 +246,9 @@ const escapeTarget = (distanceX, distanceY, distance) => {
 onMounted(() => {
     //ゲーム画面サイズの取得
     updateGameScreenSize()
+
+    //キャラクターの位置を設定
+    setCharacterPosition()
 
     //プレイヤーをタッチした時の処理
     playerRef.value.addEventListener('touchstart', (e) => {
@@ -238,9 +282,9 @@ onMounted(() => {
             playerPosition.value = constrainPosition(newPosition.x, newPosition.y)
 
             if (playerPosition.value.x > lastPosition.value.x) {
-                isRight.value = true
+                isPlayerRight.value = true
             } else if (playerPosition.value.x < lastPosition.value.x) {
-                isRight.value = false
+                isPlayerRight.value = false
             }
             lastPosition.value = { ...playerPosition.value }
 
