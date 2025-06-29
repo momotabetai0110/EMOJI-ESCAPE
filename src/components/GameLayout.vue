@@ -81,6 +81,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseModal from './BaseModal.vue'
+import { emojiApi } from '../api/emojiApi'
 
 const router = useRouter()
 
@@ -255,6 +256,14 @@ const goToRanking = () => {
 }
 
 onMounted(() => {
+
+    //テスト用APIの呼び出し
+    emojiApi.getTestData().then(response => {
+        console.log(response)
+    }).catch(error => {
+        console.error('テスト用APIの呼び出しエラー:', error)
+    })
+
     //ゲーム画面サイズの取得
     updateGameScreenSize()
 
