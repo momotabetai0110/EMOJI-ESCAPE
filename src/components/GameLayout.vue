@@ -15,14 +15,17 @@
             {{ Math.floor(countTime / 100).toString().padStart(2, '0') }}.{{ (countTime % 60).toString().padStart(2,
                 '0')
             }} </div>
-
-        <div ref="playerRef" class="character" :style="{ left: `${playerPosition.x}px`, top: `${playerPosition.y}px` }">
-            <img v-show="isPlayerRight" alt="player" src="../assets/escape1_right.png" />
-            <img v-show="!isPlayerRight" alt="player" src="../assets/escape1_left.png" />
-        </div>
-        <div ref="targetRef" class="character" :style="{ left: `${targetPosition.x}px`, top: `${targetPosition.y}px` }">
-            <img v-show="isTargetRight" alt="target" src="../assets/escape2_right.png" />
-            <img v-show="!isTargetRight" alt="target" src="../assets/escape2_left.png" />
+        <div v-show="gameStatus != 0">
+            <div ref="playerRef" class="character"
+                :style="{ left: `${playerPosition.x}px`, top: `${playerPosition.y}px` }">
+                <img v-show="isPlayerRight" alt="player" src="../assets/escape1_right.png" />
+                <img v-show="!isPlayerRight" alt="player" src="../assets/escape1_left.png" />
+            </div>
+            <div ref="targetRef" class="character"
+                :style="{ left: `${targetPosition.x}px`, top: `${targetPosition.y}px` }">
+                <img v-show="isTargetRight" alt="target" src="../assets/escape2_right.png" />
+                <img v-show="!isTargetRight" alt="target" src="../assets/escape2_left.png" />
+            </div>
         </div>
 
 
