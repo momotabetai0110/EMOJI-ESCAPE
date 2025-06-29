@@ -52,7 +52,7 @@
                         <img alt="game-over" src="../assets/game-over.png" style="height: 35%; width: 35%;">
                         <div class="modal-button">
                             <button type="button" class="btn btn-light" @click="resetGame()">再挑戦</button>
-                            <button type="button" class="btn btn-light">ランキングへ</button>
+                            <button type="button" class="btn btn-light" @click="goToRanking()">ランキングへ</button>
                         </div>
                     </div>
                 </div>
@@ -79,7 +79,10 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import BaseModal from './BaseModal.vue'
+
+const router = useRouter()
 
 //ゲームステータス管理
 const gameStatus = ref(0) // 0: スタート画面, 1: ゲーム中, 2: ゲームクリア, 3: ゲームオーバー, 4: 遊び方
@@ -242,6 +245,13 @@ const escapeTarget = (distanceX, distanceY, distance) => {
         gameStatus.value = 3
         gameOver()
     }
+}
+
+//ランキング画面への遷移
+const goToRanking = () => {
+    isModal.value = false
+    resetGame()
+    router.push('/ranking')
 }
 
 onMounted(() => {
