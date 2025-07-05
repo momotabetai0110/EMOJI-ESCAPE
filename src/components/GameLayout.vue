@@ -92,6 +92,7 @@ const isModal = ref(false) //モーダル表示
 const modalTitle = ref('') //モーダルタイトル
 const showOKbutton = ref(false) //モーダルOKボタン表示
 const timer = ref(null)
+const isConnect = ref(false) // 0:接続失敗,1:接続成功
 
 //ゲーム画面管理
 const gameScreenRef = ref(null)
@@ -255,14 +256,11 @@ const goToRanking = () => {
     router.push('/ranking')
 }
 
-onMounted(() => {
+onMounted(async () => {
 
-    //テスト用APIの呼び出し
-    emojiApi.getTestData().then(response => {
-        console.log(response)
-    }).catch(error => {
-        console.error('テスト用APIの呼び出しエラー:', error)
-    })
+    //接続確認用APIの呼び出し
+    isConnect.value = await emojiApi.getTestData()
+    console.log(isConnect.value)
 
     //ゲーム画面サイズの取得
     updateGameScreenSize()

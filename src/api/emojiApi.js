@@ -2,13 +2,13 @@
 import api from './index'
 
 export const emojiApi = {
-//テスト用API
+//接続確認用API
     getTestData: async()=>{
         try{
-        return await api.get('/test')
+            await api.get('/connect')
+            return 1
         }catch(error){
-            console.error('テストデータ取得エラー:', error)
-            throw error
+            return 0
         }
     },
     //クライアントID作成
