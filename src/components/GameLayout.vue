@@ -82,8 +82,10 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseModal from './BaseModal.vue'
 import { emojiApi } from '../api/emojiApi'
+import { useCookieFunction } from '../composables/useCookies.js'
 
 const router = useRouter()
+const { getParamByCookie, saveKeyToCookie } = useCookieFunction()
 
 //ゲームステータス管理
 const gameStatus = ref(0) // 0: スタート画面, 1: ゲーム中, 2: ゲームクリア, 3: ゲームオーバー, 4: 遊び方
@@ -93,6 +95,7 @@ const modalTitle = ref('') //モーダルタイトル
 const showOKbutton = ref(false) //モーダルOKボタン表示
 const timer = ref(null)
 const isConnect = ref(false) // 0:接続失敗,1:接続成功
+const clientId = ref(null) //クライアントID
 
 //ゲーム画面管理
 const gameScreenRef = ref(null)
@@ -213,6 +216,19 @@ const randomPosition = (domain) => {
     return { x: randomX, y: randomY }
 }
 
+//クライアントIDを取得
+const settingClientId = async () => {
+    clientId.value = getParamByCookie('clientId')
+    if (clientId.value) {
+        console.log('クライアントIDあり')
+    } else {
+        console.log('クライアントID作成')
+        const res = await emojiApi.getClientId()
+        clientId.value = res.clientId
+        saveKeyToCookie('clientId', clientId.value)
+    }
+}
+
 //キャラクターの位置を制限
 const constrainPosition = (x, y) => {
     const constrainedX = Math.max(0, Math.min(Math.floor(x), maxX.value))
@@ -267,6 +283,12 @@ onMounted(async () => {
 
     //キャラクターの位置を設定
     setCharacterPosition()
+
+    //クライアントIDの取得
+    if (isConnect.value) {
+        settingClientId()
+    }
+
 
     //プレイヤーをタッチした時の処理
     playerRef.value.addEventListener('touchstart', (e) => {

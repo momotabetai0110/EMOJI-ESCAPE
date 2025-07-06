@@ -12,9 +12,9 @@ export const emojiApi = {
         }
     },
     //クライアントID作成
-    getClientIds: async() => {
+    getClientId: async() => {
         try{
-        return await api.post('/clientIds')
+        return await api.post('/clientId')
         }catch(error){
             console.error('クライアントID取得エラー:', error)
             throw error
