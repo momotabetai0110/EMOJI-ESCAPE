@@ -30,9 +30,14 @@ export const emojiApi = {
         }
     },
     //ランキング更新
-    postRanking: async(clientId, score)=>{
+    postRanking: async(clientId, score, clearTime, date)=>{
         try{
-        return await api.post('/rankings',{clientId:clientId,gameScore:score})
+        return await api.post('/rankings',{
+            clientId: clientId,
+            clearScore: score,
+            clearTime: clearTime,
+            date: date
+        })
         }catch(error){
             console.error('ランキング更新エラー:', error)
             throw error

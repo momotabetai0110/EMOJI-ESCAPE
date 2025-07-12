@@ -96,6 +96,7 @@ const showOKbutton = ref(false) //モーダルOKボタン表示
 const timer = ref(null)
 const isConnect = ref(false) // 0:接続失敗,1:接続成功
 const clientId = ref(null) //クライアントID
+const rankings = ref([]) //ランキング
 
 //ゲーム画面管理
 const gameScreenRef = ref(null)
@@ -153,11 +154,16 @@ const gameOver = () => {
 }
 
 //ゲームクリア
-const gameClear = () => {
+const gameClear = async () => {
     isTouch.value = false
     showOKbutton.value = false
     clearInterval(timer.value)
     score.value = 1500 - (1500 - countTime.value)
+    if (isConnect.value) {
+        const currentDate = new Date().toISOString()
+        const timeString = formatTime(countTime.value)
+        await emojiApi.postRanking(clientId.value, score.value, timeString, currentDate)
+    }
     modalTitle.value = 'ゲームクリア'
     isModal.value = true
 }
@@ -242,8 +248,10 @@ const constrainPosition = (x, y) => {
 
 //ターゲットが逃げる処理
 const escapeTarget = (distanceX, distanceY, distance) => {
-    const escapeX = (distanceX / distance) * -20
-    const escapeY = (distanceY / distance) * -20
+    // const escapeX = (distanceX / distance) * -20
+    // const escapeY = (distanceY / distance) * -20
+    const escapeX = (distanceX / distance) * -1
+    const escapeY = (distanceY / distance) * -1
 
     //ターゲットの向きを設定
     if (escapeX > 0) {
@@ -263,6 +271,15 @@ const escapeTarget = (distanceX, distanceY, distance) => {
         gameStatus.value = 3
         gameOver()
     }
+}
+
+//ミリ秒を時間形式に変換
+const formatTime = (milliseconds) => {
+    const totalSeconds = Math.floor(milliseconds / 100)
+    const hours = Math.floor(totalSeconds / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const seconds = totalSeconds % 60
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 
 //ランキング画面への遷移
@@ -339,8 +356,10 @@ onMounted(async () => {
 
                 if (distance < 60) {
                     //距離が60未満の場合はゲームクリア
-                    gameStatus.value = 2
-                    gameClear()
+                    if (gameStatus.value != 2) {
+                        gameStatus.value = 2
+                        gameClear()
+                    }
                 } else if (distance < 100) {
                     //距離が100未満の場合はターゲットが逃げる
                     escapeTarget(dx, dy, distance)

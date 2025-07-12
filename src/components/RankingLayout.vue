@@ -5,14 +5,14 @@
             <div class="ranking-your-content">
                 <!-- ユーザーID -->
                 <div class="ranking-your-id">
-                    <p>あなたのID</p>
+                    <div>あなたのID</div>
                     <p>{{ userID }}</p>
                 </div>
 
                 <!-- ユーザーランク -->
                 <div class="ranking-your-rank">
-                    <p>あなたの順位</p>
-                    <p>{{ userRank }}</p>
+                    <div>あなたの順位</div>
+                    <div>{{ userRank }}位</div>
                     <p>スコア:{{ userScore }}</p>
                 </div>
 
@@ -115,10 +115,30 @@ onMounted(() => {
 
 <style>
 .ranking-screen {
-    background-color: bisque;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    background-color: rgb(241, 246, 216);
+    padding: 20px;
+}
+
+.ranking-inner {
+    align-items: center;
+    justify-content: center;
+}
+
+.ranking-your-content {
     display: flex;
     justify-content: center;
-    flex: 1
+    gap: 20px;
 }
+
+.ranking-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 </style>
