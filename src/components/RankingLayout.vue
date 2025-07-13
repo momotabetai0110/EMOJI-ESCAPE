@@ -1,25 +1,22 @@
 <template>
     <div class="ranking-screen">
-        <h1>ランキング</h1>
+        <div class="ranking-header">
+            <h1>ランキング</h1>
+        </div>
         <div class="ranking-inner">
+            <div class="ranking-your-content-wrapper">
             <div class="ranking-your-content">
-                <!-- ユーザーID -->
-                <div class="ranking-your-id">
-                    <div>あなたのID</div>
-                    <p>{{ userID }}</p>
-                </div>
-
-                <!-- ユーザーランク -->
-                <div class="ranking-your-rank">
-                    <div>あなたの順位</div>
-                    <div>{{ userRank }}位</div>
-                    <p>スコア:{{ userScore }}</p>
-                </div>
-
+                <div class="user-id">あなたのID:{{ userID }}</div>
+                <div class="user-rank">あなたの順位:{{ userRank }}位</div>
             </div>
+            <div class="ranking-your-score">
+                <div>スコア:{{ userScore }}</div>
+            </div>
+        </div>
             <!-- ランキング -->
             <div class="ranking-list">
-                <div class="ranking-card" v-for="rankingScore in rankingScores">
+                <div class="ranking-card" v-for="(rankingScore, index) in rankingScores">
+                    {{ index + 1 }}位
                     ID:{{ rankingScore.session_id }}
                     スコア:{{ rankingScore.ranking_score }}
                     {{ rankingScore.created_time }}
@@ -78,32 +75,80 @@ onMounted(() => {
         //ダミーデータ
         rankingScores.value = [
             {
-                "session_id": 1,
-                "ranking_score": 1,
+                "session_id": 123456,
+                "ranking_score": 1000,
                 "created_time": "2025-06-25 17:04:00"
             },
             {
-                "session_id": 2,
-                "ranking_score": 2,
+                "session_id": 234567,
+                "ranking_score": 900,
                 "created_time": "2025-06-24 17:04:00"
             },
             {
-                "session_id": 3,
-                "ranking_score": 3,
+                "session_id": 345678,
+                "ranking_score": 800,
                 "created_time": "2025-05-25 17:04:00"
             },
             {
-                "session_id": 4,
-                "ranking_score": 2,
+                "session_id": 456789,
+                "ranking_score": 700,
                 "created_time": "2025-06-25 10:04:00"
             },
             {
-                "session_id": 5,
-                "ranking_score": 5,
+                "session_id": 567890,
+                "ranking_score": 600,
+                "created_time": "2025-06-25 17:00:00"
+            },
+            {
+                "session_id": 567890,
+                "ranking_score": 600,
+                "created_time": "2025-06-25 17:00:00"
+            },
+            {
+                "session_id": 567890,
+                "ranking_score": 600,
+                "created_time": "2025-06-25 17:00:00"
+            },
+            {
+                "session_id": 567890,
+                "ranking_score": 600,
+                "created_time": "2025-06-25 17:00:00"
+            },
+            {
+                "session_id": 567890,
+                "ranking_score": 600,
+                "created_time": "2025-06-25 17:00:00"
+            },
+            {
+                "session_id": 567890,
+                "ranking_score": 600,
+                "created_time": "2025-06-25 17:00:00"
+            },
+            {
+                "session_id": 567890,
+                "ranking_score": 600,
+                "created_time": "2025-06-25 17:00:00"
+            },
+            {
+                "session_id": 567890,
+                "ranking_score": 600,
+                "created_time": "2025-06-25 17:00:00"
+            },
+            {
+                "session_id": 843522,
+                "ranking_score": 600,
+                "created_time": "2025-06-25 17:00:00"
+            },{
+                "session_id": 567890,
+                "ranking_score": 600,
                 "created_time": "2025-06-25 17:00:00"
             }
+
+
+
+
         ]
-        userID.value = 1
+        userID.value = 843522
         userRank.value = 1
         userScore.value = 100
 
@@ -121,6 +166,9 @@ onMounted(() => {
     align-items: center;
     background-color: rgb(241, 246, 216);
     padding: 20px;
+    font-family: Arial, sans-serif;
+    font-weight: normal ;
+    font-size: 20px;
 }
 
 .ranking-inner {
@@ -128,17 +176,46 @@ onMounted(() => {
     justify-content: center;
 }
 
-.ranking-your-content {
+.ranking-your-content-wrapper {
     display: flex;
-    justify-content: center;
-    gap: 20px;
+    align-items: center;
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: rgb(231, 242, 251);
+}
+
+.user-id {
+    font-size: 15px;
+}
+
+.user-rank {
+    font-size: 15px;
+}
+
+.ranking-your-score {
+    padding-left: 50px;
 }
 
 .ranking-list {
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    border: 1px solid black;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgb(231, 242, 251);
+    font-size: 15px;
+    height: 500px;
+    overflow-y: auto;
 }
+
+.ranking-card {
+    border-bottom: 1px solid rgb(76, 76, 77);
+    padding: 5px;
+}
+
 
 </style>
