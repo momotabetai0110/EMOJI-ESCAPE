@@ -1,0 +1,74 @@
+# Emoji Escape プロジェクト用 Cursor AI 指示書
+
+## プロジェクト概要
+これは「Emoji Escape」というVue.js 3ゲームプロジェクトです。Vue 3、Vue Router、Viteを使用したWebベースのゲームです。
+
+## 回答する際の注意事項
+- コードは変えないでください。
+- 聞いたことに対してはサンプルコードやヒントを教えて
+- この指示を理解している確認するためにcheckときいたら★OK★と返して
+- 回答は日本語のみ許さます。
+
+## 技術スタック
+- Vue.js 3 (Composition API)
+- Vue Router 4
+- Vite (ビルドツール)
+- Bootstrap 5 (UIフレームワーク)
+- Axios (HTTPクライアント)
+
+## コーディング規約
+- Vue 3 Composition APIと`<script setup>`構文を使用
+- 2スペースのインデントを使用
+- 変数と関数はcamelCaseを使用
+- コンポーネント名はPascalCaseを使用
+- ファイル名はkebab-caseを使用
+- ES6+構文を優先（const/let、アロー関数、テンプレートリテラル）
+
+## ファイル構造
+- `src/components/` - Vueコンポーネント
+- `src/assets/` - 静的アセット（画像、CSS）
+- `src/api/` - API関連ファイル
+- `src/router/` - Vue Router設定
+- `src/composables/` - Vueコンポーザブル（カスタムフック）
+
+## コンポーネントガイドライン
+- コンポーネントには`<script setup>`構文を使用
+- コンポーネントは焦点を絞り、単一の目的を持つようにする
+- 親子間の通信にはpropsを使用
+- 子親間の通信にはemitsを使用
+- 共有ロジックにはcomposablesを使用
+
+## APIガイドライン
+- HTTPリクエストにはAxiosを使用
+- エラーは適切に処理する
+- async/await構文を使用
+- API呼び出しは`src/api/`ディレクトリに構造化する
+
+## CSSガイドライン
+- 可能な限りBootstrap 5クラスを使用
+- カスタムCSSは`src/assets/`に配置
+- テーマにはCSSカスタムプロパティを使用
+- カスタムCSSクラスにはBEM手法に従う
+
+## 開発ワークフロー
+- 開発には`npm run dev`を使用
+- 本番ビルドには`npm run build`を使用
+- 本番ビルドのプレビューには`npm run preview`を使用
+
+## AIアシスタントガイドライン
+このプロジェクトを支援する際は：
+1. 常にVue 3 Composition APIパターンを提案する
+2. 新しいコンポーネントには`<script setup>`構文を優先する
+3. 適切な場合はBootstrap 5クラスをスタイリングに使用する
+4. 既存のファイル構造に従う
+5. 既存のコードスタイルとの一貫性を保つ
+6. モバイルレスポンシブを考慮する
+7. パフォーマンスとユーザーエクスペリエンスを最適化する
+
+## よく使うパターン
+- 反応的なプリミティブ値には`ref()`を使用
+- 反応的なオブジェクトには`reactive()`を使用
+- 派生状態には`computed()`を使用
+- 副作用には`watch()`または`watchEffect()`を使用
+- ライフサイクルフックには`onMounted()`を使用
+
