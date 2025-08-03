@@ -1,26 +1,38 @@
 <template>
     <div class="ranking-screen">
         <div class="ranking-header">
-            <h1>ランキング</h1>
+            <h2>ランキング</h2>
         </div>
         <div class="ranking-inner">
             <div class="ranking-your-content-wrapper">
-            <div class="ranking-your-content">
-                <div class="user-id">あなたのID:{{ userID }}</div>
-                <div class="user-rank">あなたの順位:{{ userRank }}位</div>
+                <div class="ranking-your-content">
+                    <div class="user-id">あなたのID:{{ userID }}</div>
+                    <div class="user-rank">あなたの順位:{{ userRank }}位</div>
+                </div>
+                <div class="ranking-your-score">
+                    <div>スコア:{{ userScore }}</div>
+                </div>
             </div>
-            <div class="ranking-your-score">
-                <div>スコア:{{ userScore }}</div>
-            </div>
-        </div>
             <!-- ランキング -->
             <div class="ranking-list">
-                <div class="ranking-card" v-for="(rankingScore, index) in rankingScores">
-                    {{ index + 1 }}位
-                    ID:{{ rankingScore.session_id }}
-                    スコア:{{ rankingScore.ranking_score }}
-                    {{ rankingScore.created_time }}
-                </div>
+                <table class="ranking-table">
+                    <thead class="sticky-header">
+                        <tr>
+                            <th>順位</th>
+                            <th>ID</th>
+                            <th>スコア</th>
+                            <th>日時</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class=" ranking-card" v-for="(rankingScore, index) in rankingScores">
+                            <td>{{ index + 1 }}位</td>
+                            <td>{{ rankingScore.session_id }}</td>
+                            <td>{{ rankingScore.ranking_score }}</td>
+                            <td>{{ rankingScore.created_time }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -31,21 +43,26 @@
                 <p>ランキングを使用することができません</p>
             </div>
         </BaseModal>
+        <!-- ローディングモーダル -->
+        <LoadingModal v-model="isLoading" />
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import BaseModal from './BaseModal.vue'
+import LoadingModal from './LoadingModal.vue'
+import { emojiApi } from '../api/emojiApi'
+import { useCookieFunction } from '../composables/useCookies.js'
 
-
-const canAPI = (false) //APIを使用するかどうか
+const isConnect = ref(false) // 0:接続失敗,1:接続成功
 const rankingScores = ref(null) //ランキング用スコア配列
 
 //モーダル管理
 const isModal = ref(false) //モーダルの表示状態　true:表示中,false:非表示
 const modalStatus = ref(0) //モーダルの表示内容　0:ランキング使用不可
 const modalTitle = ref('') //モーダルのタイトル
+const isLoading = ref(false) //0:通常　1:ロード中
 
 //ユーザー情報
 const userID = ref(null) //ユーザーID
@@ -66,8 +83,14 @@ const closeModal = (status) => {
     modalStatus.value = 0
 }
 
-onMounted(() => {
-    if (canAPI) {
+onMounted(async () => {
+
+    // //接続確認用APIの呼び出し
+    // isLoading.value = true
+    // isConnect.value = await emojiApi.getTestData()
+    // isLoading.value = false
+
+    if (isConnect.value) {
         console.log('APIを使用します')
     }
     else {
@@ -138,15 +161,11 @@ onMounted(() => {
                 "session_id": 843522,
                 "ranking_score": 600,
                 "created_time": "2025-06-25 17:00:00"
-            },{
+            }, {
                 "session_id": 567890,
                 "ranking_score": 600,
                 "created_time": "2025-06-25 17:00:00"
             }
-
-
-
-
         ]
         userID.value = 843522
         userRank.value = 1
@@ -165,15 +184,16 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
     background-color: rgb(241, 246, 216);
-    padding: 20px;
     font-family: Arial, sans-serif;
-    font-weight: normal ;
+    font-weight: normal;
     font-size: 20px;
+
 }
 
 .ranking-inner {
     align-items: center;
     justify-content: center;
+    width: 85%;
 }
 
 .ranking-your-content-wrapper {
@@ -210,12 +230,34 @@ onMounted(() => {
     font-size: 15px;
     height: 500px;
     overflow-y: auto;
+
 }
 
 .ranking-card {
     border-bottom: 1px solid rgb(76, 76, 77);
-    padding: 5px;
+    padding: 20px;
 }
 
+.ranking-table {
+    width: 100%;
+    border-spacing: 0;
+    table-layout: auto;
+    padding: 10px;
+}
+.sticky-header {
+    position: sticky;
+    background-color: rgb(231, 242, 251);
+    top: 0;
+    z-index: 10;
+}
 
+.ranking-table th {
+    text-align: center;
+}
+
+.ranking-table td {
+    text-align: center;
+    padding-top: 10px;
+    border-bottom: 1px solid rgb(41, 41, 41);
+}
 </style>
