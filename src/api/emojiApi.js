@@ -1,11 +1,28 @@
 // src/api/に配置
 import api from './index'
+import axios from 'axios'
+
+//接続確認用インスタンス
+const isConnectApi = axios.create({
+    baseURL: 'http://localhost:8000/api',
+    timeout: 30000,//15秒
+    headers: {
+        'Content-Type': 'application/json'
+    }
+})
+
+isConnectApi.interceptors.response.use(
+    response => response.data,
+    error =>{
+        return Promise.resolve({ success: false })
+    }
+)
 
 export const emojiApi = {
 //接続確認用API
     getTestData: async()=>{
         try{
-            await api.get('/connect')
+            await isConnectApi.get('/connect')
             return 1
         }catch(error){
             return 0

@@ -73,6 +73,8 @@
                 </div>
             </BaseModal>
         </div>
+        <!-- ローディングモーダル -->
+        <LoadingModal v-model="isLoading" />
     </div>
 
 </template>
@@ -81,6 +83,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseModal from './BaseModal.vue'
+import LoadingModal from './LoadingModal.vue'
 import { emojiApi } from '../api/emojiApi'
 import { useCookieFunction } from '../composables/useCookies.js'
 
@@ -97,6 +100,7 @@ const timer = ref(null)
 const isConnect = ref(false) // 0:接続失敗,1:接続成功
 const clientId = ref(null) //クライアントID
 const rankings = ref([]) //ランキング
+const isLoading = ref(false) //0:通常　1:ロード中
 
 //ゲーム画面管理
 const gameScreenRef = ref(null)
@@ -292,7 +296,10 @@ const goToRanking = () => {
 onMounted(async () => {
 
     //接続確認用APIの呼び出し
+    isLoading.value = true
     isConnect.value = await emojiApi.getTestData()
+    isLoading.value =false
+
     console.log(isConnect.value)
 
     //ゲーム画面サイズの取得
@@ -451,7 +458,7 @@ onMounted(async () => {
 }
 
 .start-text {
-    font-size: 100px;
+    font-size: 90px;
     color: #ffffff;
     z-index: 3;
     animation: blink 1s infinite;
