@@ -27,9 +27,9 @@
                     <tbody>
                         <tr class=" ranking-card" v-for="(rankingScore, index) in rankingScores">
                             <td>{{ index + 1 }}位</td>
-                            <td>{{ rankingScore.session_id }}</td>
-                            <td>{{ rankingScore.ranking_score }}</td>
-                            <td>{{ rankingScore.created_time }}</td>
+                            <td>{{ rankingScore.client_id }}</td>
+                            <td>{{ rankingScore.clear_score }}</td>
+                            <td>{{ rankingScore.created_at }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -55,7 +55,8 @@ import LoadingModal from './LoadingModal.vue'
 import { emojiApi } from '../api/emojiApi'
 import { useCookieFunction } from '../composables/useCookies.js'
 
-const isConnect = ref(false) // 0:接続失敗,1:接続成功
+const { getParamByCookie } = useCookieFunction()
+const isConnect = ref(true) // 0:接続失敗,1:接続成功
 const rankingScores = ref(null) //ランキング用スコア配列
 
 //モーダル管理
@@ -68,6 +69,7 @@ const isLoading = ref(false) //0:通常　1:ロード中
 const userID = ref(null) //ユーザーID
 const userRank = ref(null) //ユーザーランク
 const userScore = ref(null) //ユーザースコア
+const userData = ref([null])
 
 
 
@@ -85,13 +87,19 @@ const closeModal = (status) => {
 
 onMounted(async () => {
 
-    // //接続確認用APIの呼び出し
-    // isLoading.value = true
-    // isConnect.value = await emojiApi.getTestData()
-    // isLoading.value = false
+    //接続確認用APIの呼び出し
+    isLoading.value = true
+    isConnect.value = await emojiApi.getTestData()
+
 
     if (isConnect.value) {
         console.log('APIを使用します')
+        rankingScores.value = await emojiApi.getRankings()
+        userID.value = getParamByCookie('clientId')
+        userData.value = await emojiApi.getRankings(userID.value )
+        userRank.value = userData.value['rank']
+        userScore.value =  userData.value['high_score']
+        isLoading.value = false
     }
     else {
         console.log('APIを使用しません')
@@ -173,6 +181,7 @@ onMounted(async () => {
 
         modalTitle.value = 'ランキングを使用することができません'
         openModal(0)
+        isLoading.value = false
     }
 })
 </script>

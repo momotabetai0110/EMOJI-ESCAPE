@@ -38,9 +38,11 @@ export const emojiApi = {
         }
     },
     //ランキング取得
-    getRankings: async()=>{
+    getRankings: async(clientId)=>{
         try{
-        return await api.get('/rankings')
+        return await api.get('/rankings',{
+            params:{clientId: clientId}
+        })
         }catch(error){
             console.error('ランキング取得エラー:', error)
             return []
