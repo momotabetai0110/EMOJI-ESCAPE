@@ -12,9 +12,7 @@
 
         <!-- ゲーム画面 -->
         <div v-if="gameStatus != 0" class="count-time">
-            {{ Math.floor(countTime / 100).toString().padStart(2, '0') }}.{{ (countTime % 60).toString().padStart(2,
-                '0')
-            }} </div>
+            {{ Math.floor(countTime / 1000).toString().padStart(2, '0') }}.{{ Math.floor((countTime % 1000) / 10).toString().padStart(2, '0') }}</div>
         <div v-show="gameStatus == 1">
             <div ref="playerRef" class="character"
                 :style="{ left: `${playerPosition.x}px`, top: `${playerPosition.y}px` }">
@@ -98,7 +96,7 @@ const { getParamByCookie, saveKeyToCookie } = useCookieFunction()
 
 //ゲームステータス管理
 const gameStatus = ref(0) // 0: スタート画面, 1: ゲーム中, 2: ゲームクリア, 3: ゲームオーバー, 4: 遊び方
-const countTime = ref(1500) //1500ミリ秒(15秒)
+const countTime = ref(15000) //1500ミリ秒(15秒)
 const isModal = ref(false) //モーダル表示
 const modalTitle = ref('') //モーダルタイトル
 const timer = ref(null)
@@ -148,7 +146,7 @@ const startGame = () => {
 //タイマースタート
 const startTimer = () => {
     timer.value = setInterval(() => {
-        countTime.value--
+        countTime.value -= 10
         if (countTime.value <= 0) {
             gameStatus.value = 3
             clearInterval(timer.value)
