@@ -75,10 +75,6 @@ const userRank = ref(null) //ユーザーランク
 const userScore = ref(null) //ユーザースコア
 const userData = ref([null])
 
-
-
-
-
 const openModal = (status) => {
     isModal.value = true
     showOKbutton.value = false

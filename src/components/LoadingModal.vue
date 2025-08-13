@@ -6,16 +6,15 @@
                 <h5 class="loading-modal-title">Now Loading</h5>
             </div>
             <div class="loading-modal-body">
-                <h4 class="loading-modal-title" style="padding: 10px;">ロード中...</h4>
-                <img alt="earth" src="../assets/earth.png"
-                    style="height: 50%; width: 50%;">
+                <h4 class="loading-modal-title" style="padding: 10px;">{{ loadingText }}</h4>
+                <img alt="earth" src="../assets/earth.png" style="height: 50%; width: 50%;">
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, watch,defineProps } from 'vue'
+import { ref, watch, defineProps, onMounted,onUnmounted } from 'vue'
 
 const props = defineProps({
     modelValue: {
@@ -25,6 +24,31 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue'])
 const isDisplay = ref(props.modelValue)
+const intervalCount = ref(1)
+const loadingText = ref("ロード中")
+
+
+const startTimer = () => {
+    const intervalId = setInterval(() => {
+        const count = intervalCount.value % 3
+        const dots = '.'.repeat(count+1)
+        loadingText.value = `ロード中${dots}`
+        intervalCount.value =  (intervalCount.value + 1) % 3
+    }, 500)
+    return intervalId
+}
+
+onMounted(async () => {
+    const timerId = startTimer()
+
+    // コンポーネントがアンマウントされた時にタイマーを停止
+    onUnmounted(() => {
+        if (timerId) {
+            clearInterval(timerId)
+        }
+    })
+})
+
 
 watch(() => props.modelValue, (newValue) => {
     isDisplay.value = newValue
@@ -33,6 +57,8 @@ watch(() => props.modelValue, (newValue) => {
 watch(isDisplay, (newValue) => {
     emit('update:modelValue', newValue)
 })
+
+
 </script>
 
 <style>
