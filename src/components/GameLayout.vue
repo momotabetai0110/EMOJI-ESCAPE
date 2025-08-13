@@ -41,7 +41,7 @@
                         <div class="modal-button">
                             <div>スコア：{{ score }}</div>
                             <button type="button" class="btn btn-light" @click="resetGame()">再挑戦</button>
-                            <button type="button" class="btn btn-light">ランキングへ</button>
+                            <button type="button" class="btn btn-light" @click="goToRanking()">ランキングへ</button>
                         </div>
                     </div>
                 </div>
