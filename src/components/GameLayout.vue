@@ -208,18 +208,18 @@ const updateGameScreenSize = () => {
 //キャラクターの位置を設定
 const setCharacterPosition = () => {
     const targetDomain = {
-        //画面の25%から75%の範囲
-        minX: gameScreenSize.value.width / 4,
-        minY: gameScreenSize.value.height / 4,
+        //画面の50%から75%の範囲
+        minX: gameScreenSize.value.width / 2,
+        minY: gameScreenSize.value.height / 2,
         maxX: gameScreenSize.value.width * 3 / 4,
         maxY: gameScreenSize.value.height * 3 / 4
     }
 
     const playerDomains = [
-        { minX: 0, minY: 0, maxX: gameScreenSize.value.width / 4, maxY: gameScreenSize.value.height / 4 }, // 上部
+        { minX: 0, minY: 0, maxX: gameScreenSize.value.width / 2, maxY: gameScreenSize.value.height / 4 }, // 上部
         { minX: gameScreenSize.value.width * 3 / 4, minY: 0, maxX: gameScreenSize.value.width, maxY: gameScreenSize.value.height }, // 右部
         { minX: 0, minY: gameScreenSize.value.height * 3 / 4, maxX: gameScreenSize.value.width, maxY: gameScreenSize.value.height }, // 下部
-        { minX: 0, minY: 0, maxX: gameScreenSize.value.width / 4, maxY: gameScreenSize.value.height } // 左部
+        { minX: 0, minY: 0, maxX: gameScreenSize.value.width / 2, maxY: gameScreenSize.value.height } // 左部
     ]
 
     const randomIndex = Math.floor(Math.random() * 4)
