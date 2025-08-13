@@ -32,12 +32,13 @@
 
         <!-- モーダル -->
         <div v-if="isModal">
-            <BaseModal v-model="isModal" :showOKbutton=showOKbutton :title=modalTitle>
+            <BaseModal v-model="isModal" :title=modalTitle>
                 <!-- ゲームクリア -->
-                <div v-if="gameStatus == 2" class="modal-content" :showOKbutton="false">
+                <div v-if="gameStatus == 2" class="modal-content">
                     <h1>ゲームクリア！！</h1>
                     <div v-if="postResult.isHighScore">ハイスコア更新!</div>
                     <div v-if="postResult.isRankUp">ランキング更新!</div>
+
                     <div class="modal-inner">
                         <img alt="game-clear" src="../assets/game-clear.png" style="height: 50%; width: 50%;">
                         <div class="modal-button">
@@ -48,7 +49,7 @@
                     </div>
                 </div>
                 <!-- ゲームオーバー -->
-                <div v-if="gameStatus == 3" class="modal-content" :showOKbutton="false">
+                <div v-if="gameStatus == 3" class="modal-content">
                     <h1>逃げられてしまった...</h1>
                     <div class="modal-inner">
                         <img alt="game-over" src="../assets/game-over.png" style="height: 35%; width: 35%;">
@@ -59,7 +60,7 @@
                     </div>
                 </div>
                 <!-- 遊び方 -->
-                <div v-if="gameStatus == 0" :showOKbutton="true" class="modal-content" style="padding-top: 25px;">
+                <div v-if="gameStatus == 0" class="modal-content">
                     <h4>指で<img alt="player" src="../assets/escape1_right.png"
                             style="height: 5%; width: 10%; ">を動かすことができます</h4>
                     <div class="modal-inner">
@@ -68,11 +69,14 @@
                             <p>時間内に<img alt="target" src="../assets/escape2_right.png"
                                     style="height: 5%; width: 10%;">をつかまえる。</p>
                             <h6>【ゲームオーバー】</h6>
-                            <p><img alt="target" src="../assets/escape2_right.png"
-                                    style="height: 5%; width: 10%;">が画面端に到達するか15秒経過する。</p>
+                            <div><img alt="target" src="../assets/escape2_right.png"
+                                    style="height: 5%; width: 10%;">が画面端に到達するか15秒経過する。</div>
                         </div>
                     </div>
+
+                    <button type="button" class="btn btn-light" @click="closeModal()">OK</button>
                 </div>
+
             </BaseModal>
         </div>
         <!-- ローディングモーダル -->
@@ -97,7 +101,6 @@ const gameStatus = ref(0) // 0: スタート画面, 1: ゲーム中, 2: ゲー�
 const countTime = ref(1500) //1500ミリ秒(15秒)
 const isModal = ref(false) //モーダル表示
 const modalTitle = ref('') //モーダルタイトル
-const showOKbutton = ref(false) //モーダルOKボタン表示
 const timer = ref(null)
 const isConnect = ref(false) // 0:接続失敗,1:接続成功
 const clientId = ref(null) //クライアントID
@@ -123,10 +126,14 @@ const lastPosition = ref({ x: 0, y: 0 }) //前回のプレイヤーの位置
 const maxX = computed(() => Math.floor(gameScreenSize.value.width - 60)) //キャラクターの最大x座標
 const maxY = computed(() => Math.floor(gameScreenSize.value.height - 60)) //キャラクターの最大y座標
 
+
+//モーダルを閉じる
+const closeModal = () => {
+    isModal.value = false
+}
 //遊び方
 const openHelp = () => {
     gameStatus.value = 0
-    showOKbutton.value = true
     modalTitle.value = 'ルール'
     isModal.value = true
 
@@ -153,7 +160,6 @@ const startTimer = () => {
 //ゲームオーバー
 const gameOver = () => {
     isTouch.value = false
-    showOKbutton.value = false
     clearInterval(timer.value)
     modalTitle.value = 'ゲームオーバー'
     isModal.value = true
@@ -162,14 +168,16 @@ const gameOver = () => {
 
 //ゲームクリア
 const gameClear = async () => {
+
     isTouch.value = false
-    showOKbutton.value = false
     clearInterval(timer.value)
     score.value = 1500 - (1500 - countTime.value)
     if (isConnect.value) {
+        isLoading.value = true
         const currentDate = new Date().toISOString()
         const timeString = formatTime(countTime.value)
         const postRanking = await emojiApi.postRanking(clientId.value, score.value, timeString, currentDate)
+        isLoading.value = false
         postResult.value.isHighScore = postRanking.isHighScore
         postResult.value.isRankUp = postRanking.isRankUp
     }
@@ -396,9 +404,10 @@ onMounted(async () => {
     margin: 0;
 }
 
-.modal-header{
+.modal-header {
     display: flex;
 }
+
 .modal-content {
     align-items: center;
 }
@@ -418,7 +427,7 @@ onMounted(async () => {
 }
 
 .modal-rule {
-    margin-top: 10px;
+    margin-top: 5px;
     display: flex;
     flex-direction: column;
     padding-left: 10px;

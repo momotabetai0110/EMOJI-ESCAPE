@@ -9,9 +9,6 @@
                 <slot>
                 </slot>
             </div>
-            <div class="modal-footer" v-if="showOKbutton">
-                <button class="btn btn-light" @click="closeModal()">OK</button>
-            </div>
         </div>
     </div>
 </template>
@@ -27,10 +24,6 @@ const props = defineProps({
     modelValue: {
         type: Boolean,
         default: false
-    },
-    showOKbutton: {
-        type: Boolean,
-        default: true
     }
 })
 const emit = defineEmits(['update:modelValue'])
@@ -39,14 +32,6 @@ const isDisplay = ref(props.modelValue)
 watch(() => props.modelValue, (newValue) => {
     isDisplay.value = newValue
 })
-
-
-const closeModal = () => {
-    isDisplay.value = false
-    emit('update:modelValue', false)
-}
-
-
 </script>
 
 <style>
@@ -83,23 +68,10 @@ const closeModal = () => {
 }
 
 .modal-body {
-    height: 70%;
+    height: 85%;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 5px;
-}
-
-.modal-footer {
-
-    justify-content: center;
-    height: 15%;
-
-}
-
-.modal-footer .btn {
-    font-size: 14px;
-    padding: 3px;
-    width: 60px;
 }
 </style>
