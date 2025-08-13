@@ -36,6 +36,8 @@
                 <!-- ゲームクリア -->
                 <div v-if="gameStatus == 2" class="modal-content" :showOKbutton="false">
                     <h1>ゲームクリア！！</h1>
+                    <div v-if="postResult.isHighScore">ハイスコア更新!</div>
+                    <div v-if="postResult.isRankUp">ランキング更新!</div>
                     <div class="modal-inner">
                         <img alt="game-clear" src="../assets/game-clear.png" style="height: 50%; width: 50%;">
                         <div class="modal-button">
@@ -107,6 +109,7 @@ const gameScreenRef = ref(null)
 const gameScreenSize = ref({ width: 0, height: 0 })
 const isTouch = ref(false) //true:タッチ中,false:タッチしていない
 const score = ref(0)
+const postResult = ref({ isHighScore: false, isRankUp: false })
 
 //ゲームキャラ管理
 const playerRef = ref(null)
@@ -166,7 +169,9 @@ const gameClear = async () => {
     if (isConnect.value) {
         const currentDate = new Date().toISOString()
         const timeString = formatTime(countTime.value)
-        await emojiApi.postRanking(clientId.value, score.value, timeString, currentDate)
+        const postRanking = await emojiApi.postRanking(clientId.value, score.value, timeString, currentDate)
+        postResult.value.isHighScore = postRanking.isHighScore
+        postResult.value.isRankUp = postRanking.isRankUp
     }
     modalTitle.value = 'ゲームクリア'
     isModal.value = true
@@ -298,7 +303,7 @@ onMounted(async () => {
     //接続確認用APIの呼び出し
     isLoading.value = true
     isConnect.value = await emojiApi.getTestData()
-    isLoading.value =false
+    isLoading.value = false
 
     console.log(isConnect.value)
 
@@ -391,6 +396,9 @@ onMounted(async () => {
     margin: 0;
 }
 
+.modal-header{
+    display: flex;
+}
 .modal-content {
     align-items: center;
 }
