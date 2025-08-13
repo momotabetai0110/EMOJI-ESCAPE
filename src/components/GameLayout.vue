@@ -35,7 +35,7 @@
                 <div v-if="gameStatus == 2" class="modal-content">
                     <h1>ゲームクリア！！</h1>
                     <div v-if="postResult.isHighScore">ハイスコア更新!</div>
-                    <div v-if="postResult.isRankUp">ランキング更新!</div>
+                    <div v-if="postResult.isRankUp">ランキング更新!({{ postResult.isRankUp }}位)</div>
 
                     <div class="modal-inner">
                         <img alt="game-clear" src="../assets/game-clear.png" style="height: 50%; width: 50%;">
@@ -169,7 +169,7 @@ const gameClear = async () => {
 
     isTouch.value = false
     clearInterval(timer.value)
-    score.value = 1500 - (1500 - countTime.value)
+    score.value = 15000 - (15000 - countTime.value)
     if (isConnect.value) {
         isLoading.value = true
         const currentDate = new Date().toISOString()
@@ -186,7 +186,7 @@ const gameClear = async () => {
 //ゲームリセット
 const resetGame = () => {
     gameStatus.value = 0
-    countTime.value = 1000
+    countTime.value = 15000
     isModal.value = false
     targetPosition.value = { x: 200, y: 200 }
     playerPosition.value = { x: 0, y: 0 }
