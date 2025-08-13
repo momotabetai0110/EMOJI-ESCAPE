@@ -37,10 +37,11 @@
         </div>
 
         <!-- モーダル -->
-        <BaseModal v-if="isModal" :title=modalTitle>
-            <!-- API使用不可 -->
-            <div v-if="modalStatus == 0">
-                <p>ランキングを使用することができません</p>
+        <BaseModal v-model="isModal" :showOKbutton="showOKbutton" :title=modalTitle>
+            <div class="offline-modal">
+                <div>サーバー停止中、またはオフラインみたいです。</div>
+                <img alt="cloud" src="../assets/cloud.png" style="height: 30%; width: 40%; ">
+                <button type="button" class="btn btn-light" @click="goToGame()">ゲームへ</button>
             </div>
         </BaseModal>
         <!-- ローディングモーダル -->
@@ -54,13 +55,16 @@ import BaseModal from './BaseModal.vue'
 import LoadingModal from './LoadingModal.vue'
 import { emojiApi } from '../api/emojiApi'
 import { useCookieFunction } from '../composables/useCookies.js'
+import { useRouter } from 'vue-router'
 
 const { getParamByCookie } = useCookieFunction()
+const router = useRouter()
 const isConnect = ref(true) // 0:接続失敗,1:接続成功
 const rankingScores = ref(null) //ランキング用スコア配列
 
 //モーダル管理
 const isModal = ref(false) //モーダルの表示状態　true:表示中,false:非表示
+const showOKbutton = ref(false) //モーダルOKボタン表示
 const modalStatus = ref(0) //モーダルの表示内容　0:ランキング使用不可
 const modalTitle = ref('') //モーダルのタイトル
 const isLoading = ref(false) //0:通常　1:ロード中
@@ -77,12 +81,20 @@ const userData = ref([null])
 
 const openModal = (status) => {
     isModal.value = true
+    showOKbutton.value = false
     modalStatus.value = status
+
 }
 
 const closeModal = (status) => {
     isModal.value = false
     modalStatus.value = 0
+}
+
+//ランキング画面への遷移
+const goToGame = () => {
+
+    router.push('/')
 }
 
 onMounted(async () => {
@@ -96,92 +108,94 @@ onMounted(async () => {
         console.log('APIを使用します')
         rankingScores.value = await emojiApi.getRankings()
         userID.value = getParamByCookie('clientId')
-        userData.value = await emojiApi.getRankings(userID.value )
+        userData.value = await emojiApi.getRankings(userID.value)
         userRank.value = userData.value['rank']
-        userScore.value =  userData.value['high_score']
+        userScore.value = userData.value['high_score']
         isLoading.value = false
     }
     else {
-        console.log('APIを使用しません')
-        //ダミーデータ
-        rankingScores.value = [
-            {
-                "session_id": 123456,
-                "ranking_score": 1000,
-                "created_time": "2025-06-25 17:04:00"
-            },
-            {
-                "session_id": 234567,
-                "ranking_score": 900,
-                "created_time": "2025-06-24 17:04:00"
-            },
-            {
-                "session_id": 345678,
-                "ranking_score": 800,
-                "created_time": "2025-05-25 17:04:00"
-            },
-            {
-                "session_id": 456789,
-                "ranking_score": 700,
-                "created_time": "2025-06-25 10:04:00"
-            },
-            {
-                "session_id": 567890,
-                "ranking_score": 600,
-                "created_time": "2025-06-25 17:00:00"
-            },
-            {
-                "session_id": 567890,
-                "ranking_score": 600,
-                "created_time": "2025-06-25 17:00:00"
-            },
-            {
-                "session_id": 567890,
-                "ranking_score": 600,
-                "created_time": "2025-06-25 17:00:00"
-            },
-            {
-                "session_id": 567890,
-                "ranking_score": 600,
-                "created_time": "2025-06-25 17:00:00"
-            },
-            {
-                "session_id": 567890,
-                "ranking_score": 600,
-                "created_time": "2025-06-25 17:00:00"
-            },
-            {
-                "session_id": 567890,
-                "ranking_score": 600,
-                "created_time": "2025-06-25 17:00:00"
-            },
-            {
-                "session_id": 567890,
-                "ranking_score": 600,
-                "created_time": "2025-06-25 17:00:00"
-            },
-            {
-                "session_id": 567890,
-                "ranking_score": 600,
-                "created_time": "2025-06-25 17:00:00"
-            },
-            {
-                "session_id": 843522,
-                "ranking_score": 600,
-                "created_time": "2025-06-25 17:00:00"
-            }, {
-                "session_id": 567890,
-                "ranking_score": 600,
-                "created_time": "2025-06-25 17:00:00"
-            }
-        ]
-        userID.value = 843522
-        userRank.value = 1
-        userScore.value = 100
-
-        modalTitle.value = 'ランキングを使用することができません'
-        openModal(0)
         isLoading.value = false
+
+        console.log('APIを使用しません')
+
+        //ダミーデータ
+        // rankingScores.value = [
+        //     {
+        //         "session_id": 123456,
+        //         "ranking_score": 1000,
+        //         "created_time": "2025-06-25 17:04:00"
+        //     },
+        //     {
+        //         "session_id": 234567,
+        //         "ranking_score": 900,
+        //         "created_time": "2025-06-24 17:04:00"
+        //     },
+        //     {
+        //         "session_id": 345678,
+        //         "ranking_score": 800,
+        //         "created_time": "2025-05-25 17:04:00"
+        //     },
+        //     {
+        //         "session_id": 456789,
+        //         "ranking_score": 700,
+        //         "created_time": "2025-06-25 10:04:00"
+        //     },
+        //     {
+        //         "session_id": 567890,
+        //         "ranking_score": 600,
+        //         "created_time": "2025-06-25 17:00:00"
+        //     },
+        //     {
+        //         "session_id": 567890,
+        //         "ranking_score": 600,
+        //         "created_time": "2025-06-25 17:00:00"
+        //     },
+        //     {
+        //         "session_id": 567890,
+        //         "ranking_score": 600,
+        //         "created_time": "2025-06-25 17:00:00"
+        //     },
+        //     {
+        //         "session_id": 567890,
+        //         "ranking_score": 600,
+        //         "created_time": "2025-06-25 17:00:00"
+        //     },
+        //     {
+        //         "session_id": 567890,
+        //         "ranking_score": 600,
+        //         "created_time": "2025-06-25 17:00:00"
+        //     },
+        //     {
+        //         "session_id": 567890,
+        //         "ranking_score": 600,
+        //         "created_time": "2025-06-25 17:00:00"
+        //     },
+        //     {
+        //         "session_id": 567890,
+        //         "ranking_score": 600,
+        //         "created_time": "2025-06-25 17:00:00"
+        //     },
+        //     {
+        //         "session_id": 567890,
+        //         "ranking_score": 600,
+        //         "created_time": "2025-06-25 17:00:00"
+        //     },
+        //     {
+        //         "session_id": 843522,
+        //         "ranking_score": 600,
+        //         "created_time": "2025-06-25 17:00:00"
+        //     }, {
+        //         "session_id": 567890,
+        //         "ranking_score": 600,
+        //         "created_time": "2025-06-25 17:00:00"
+        //     }
+        // ]
+        // userID.value = 843522
+        // userRank.value = 1
+        // userScore.value = 100
+
+        modalTitle.value = 'ランキングが使用できません'
+        openModal(1)
     }
 })
 </script>
@@ -253,6 +267,7 @@ onMounted(async () => {
     table-layout: auto;
     padding: 10px;
 }
+
 .sticky-header {
     position: sticky;
     background-color: rgb(231, 242, 251);
@@ -268,5 +283,13 @@ onMounted(async () => {
     text-align: center;
     padding-top: 10px;
     border-bottom: 1px solid rgb(41, 41, 41);
+}
+
+.offline-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: small;
+    gap: 10px;
 }
 </style>

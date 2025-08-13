@@ -22,7 +22,7 @@ export const emojiApi = {
 //接続確認用API
     getTestData: async()=>{
         try{
-            await isConnectApi.get('/connect')
+            await api.get('/connect')
             return 1
         }catch(error){
             return 0
