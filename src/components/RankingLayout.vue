@@ -37,7 +37,7 @@
         </div>
 
         <!-- モーダル -->
-        <BaseModal v-model="isModal" :showOKbutton="showOKbutton" :title=modalTitle>
+        <BaseModal v-model="isModal" :title=modalTitle>
             <div class="offline-modal">
                 <div>サーバー停止中、またはオフラインみたいです。</div>
                 <img alt="cloud" src="../assets/cloud.png" style="height: 30%; width: 40%; ">
@@ -64,7 +64,6 @@ const rankingScores = ref(null) //ランキング用スコア配列
 
 //モーダル管理
 const isModal = ref(false) //モーダルの表示状態　true:表示中,false:非表示
-const showOKbutton = ref(false) //モーダルOKボタン表示
 const modalStatus = ref(0) //モーダルの表示内容　0:ランキング使用不可
 const modalTitle = ref('') //モーダルのタイトル
 const isLoading = ref(false) //0:通常　1:ロード中
@@ -77,19 +76,12 @@ const userData = ref([null])
 
 const openModal = (status) => {
     isModal.value = true
-    showOKbutton.value = false
     modalStatus.value = status
 
 }
 
-const closeModal = (status) => {
-    isModal.value = false
-    modalStatus.value = 0
-}
-
 //ランキング画面への遷移
 const goToGame = () => {
-
     router.push('/')
 }
 
