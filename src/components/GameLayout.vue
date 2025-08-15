@@ -59,14 +59,14 @@
                 </div>
                 <!-- 遊び方 -->
                 <div v-if="gameStatus == 0" class="modal-content">
-                    <h4>指で<img alt="player" src="../assets/escape1_right.png"
-                            style="height: 5%; width: 10%; ">を動かすことができます</h4>
+                    <h6>指で<img alt="player" src="../assets/escape1_right.png"
+                            style="height: 5%; width: 10%; ">を動かすことができます</h6>
                     <div class="modal-inner">
                         <div class="modal-rule">
-                            <h6>【ゲームクリア】</h6>
+                            <div>【ゲームクリア】</div>
                             <p>時間内に<img alt="target" src="../assets/escape2_right.png"
                                     style="height: 5%; width: 10%;">をつかまえる。</p>
-                            <h6>【ゲームオーバー】</h6>
+                            <div>【ゲームオーバー】</div>
                             <div><img alt="target" src="../assets/escape2_right.png"
                                     style="height: 5%; width: 10%;">が画面端に到達するか15秒経過する。</div>
                         </div>
@@ -188,8 +188,7 @@ const resetGame = () => {
     gameStatus.value = 0
     countTime.value = 15000
     isModal.value = false
-    targetPosition.value = { x: 200, y: 200 }
-    playerPosition.value = { x: 0, y: 0 }
+    setCharacterPosition()
     isPlayerRight.value = true
     isTargetRight.value = true
 }
@@ -263,10 +262,10 @@ const constrainPosition = (x, y) => {
 
 //ターゲットが逃げる処理
 const escapeTarget = (distanceX, distanceY, distance) => {
-    // const escapeX = (distanceX / distance) * -20
-    // const escapeY = (distanceY / distance) * -20
-    const escapeX = (distanceX / distance) * -1
-    const escapeY = (distanceY / distance) * -1
+    const escapeX = (distanceX / distance) * -20
+    const escapeY = (distanceY / distance) * -20
+    // const escapeX = (distanceX / distance) * -1
+    // const escapeY = (distanceY / distance) * -1
 
     //ターゲットの向きを設定
     if (escapeX > 0) {
@@ -425,7 +424,7 @@ onMounted(async () => {
 }
 
 .modal-rule {
-    margin-top: 5px;
+    margin-top: 0px;
     display: flex;
     flex-direction: column;
     padding-left: 10px;
