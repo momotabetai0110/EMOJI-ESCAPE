@@ -235,7 +235,6 @@ onMounted(async () => {
     flex-direction: column;
     align-items: center;
     border: 1px solid black;
-    padding: 10px;
     border-radius: 10px;
     background-color: rgb(231, 242, 251);
     font-size: 15px;
